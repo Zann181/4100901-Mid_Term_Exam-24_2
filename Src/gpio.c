@@ -52,7 +52,31 @@ void configure_gpio_for_usart(void)
 
 void configure_gpio(void)
 {
+   *RCC_AHB2ENR |= (1 << 0) | (1 << 2); // Enable clock for GPIOA and GPIOC
 
+    // Configure PA5 as output
+    GPIOA->MODER &= ~(3U << (LED_PIN * 2)); // Clear mode bits for PA5
+    GPIOA->MODER |= (1U << (LED_PIN * 2));  // Set output mode for PA5
+
+    // Configure PC13 as input
+    GPIOC->MODER &= ~(3U << (BUTTON_PIN * 2)); // Clear mode bits for PC13
+
+    // Enable clock for SYSCFG
+    *RCC_APB2ENR |= (1 << 0); // RCC_APB2ENR_SYSCFGEN
+
+    // Configure SYSCFG EXTICR to map EXTI13 to PC13
+    SYSCFG->EXTICR[3] &= ~(0xF << 4); // Clear bits for EXTI13
+    SYSCFG->EXTICR[3] |= (0x2 << 4);  // Map EXTI13 to Port C
+
+    // Configure EXTI13 for falling edge trigger
+    EXTI->FTSR1 |= (1 << BUTTON_PIN);  // Enable falling trigger
+    EXTI->RTSR1 &= ~(1 << BUTTON_PIN); // Disable rising trigger
+
+    // Unmask EXTI13
+    EXTI->IMR1 |= (1 << BUTTON_PIN);
+
+    // Enable EXTI15_10 interrupt
+    *NVIC_ISER1 |= (1 << (EXTI15_10_IRQn - 32));
     
 }
 
@@ -72,7 +96,10 @@ void gpio_toggle_heartbeat_led(void) {
 volatile uint8_t button_pressed = 0; // Flag to indicate button press
 uint8_t button_driver_get_event(void)
 {
-    return button_pressed;
+    uint8_t event = button_pressed;
+    button_pressed = 0;
+    return event;
+
 }
 
 uint32_t b1_tick = 0;
