@@ -51,11 +51,13 @@ void gpio_set_door_led_state(uint8_t state);
 // LED de latido (heartbeat)
 void gpio_toggle_heartbeat_led(void);
 
+void gpio_toggle_led2(void);
+
 // Lectura de botones (simple/doble pulsación se maneja en otra capa)
 uint8_t button_driver_get_event(void);
+uint8_t button2_driver_get_event(void);
 
 
 void configure_gpio_for_usart(void);
 
 #endif // GPIO_H
-

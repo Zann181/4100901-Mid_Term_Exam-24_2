@@ -67,6 +67,7 @@ int main(void) {
         uint8_t button_pressed = button_driver_get_event();
         if (button_pressed != 0) {
             handle_event(button_pressed);
+            usart2_send_string("System button \r\n");
             button_pressed = 0;
         }
 
