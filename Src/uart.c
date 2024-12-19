@@ -11,7 +11,18 @@ void usart2_init(void)
 
     *RCC_APB1ENR1 |= RCC_APB1ENR1_USART2EN;
 
-    // TODO: Configurar UART2
+    // 1. Desactivar la UART
+    USART2->CR1 &= ~USART_CR1_UE;
+    // 2. Configurar la velocidad de transmisión
+    USART2->BRR = BAUD_9600_4MHZ;
+    // 3. Configurar el número de bits de datos
+    USART2->CR1 &= ~USART_CR1_M;
+    // 4. Configurar el número de bits de parada
+    USART2->CR2 &= ~USART_CR2_STOP;
+    // 5. Habilitar Transmisor y Receptor
+    USART2->CR1 |= USART_CR1_TE | USART_CR1_RE;
+    // 6. Habilitar la UART
+    USART2->CR1 |= USART_CR1_UE;
 
     // Activar interrupción de RXNE
     USART2->CR1 |= USART_CR1_RXNEIE; 
