@@ -34,17 +34,21 @@ void run_state_machine(void) {
 
 void handle_event(uint8_t event) {
     if (event == 1) { // Single button press
+        usart2_send_string("Single Button Press\r\n");
         gpio_set_door_led_state(1); // Turn on door state LED
         current_state = TEMP_UNLOCK;
         unlock_timer = systick_GetTick();
     } else if (event == 2) { // Double button press
+        usart2_send_string("Double Button Press\r\n");
         gpio_set_door_led_state(1); // Turn on door state LED
         current_state = PERM_UNLOCK;
     } else if (event == 'O') { // UART OPEN command
+        usart2_send_string("Open Command Received\r\n");
         gpio_set_door_led_state(1); // Turn on door state LED
         current_state = TEMP_UNLOCK;
         unlock_timer = systick_GetTick();
     } else if (event == 'C') { // UART CLOSE command
+        usart2_send_string("Close Command Received\r\n");
         gpio_set_door_led_state(0); // Turn off door state LED
         current_state = LOCKED;
     }
@@ -66,14 +70,15 @@ int main(void) {
 
         uint8_t button_pressed = button_driver_get_event();
         if (button_pressed != 0) {
+            usart2_send_string("Button Pressed\r\n");
             handle_event(button_pressed);
             button_pressed = 0;
         }
 
         uint8_t rx_byte = usart2_get_command();
         if (rx_byte != 0) {
+            usart2_send_string("Command Received\r\n");
             handle_event(rx_byte);
-            rx_byte = 0;
         }
 
         run_state_machine();
